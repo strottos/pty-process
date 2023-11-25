@@ -1,5 +1,5 @@
 /// An allocated pty
-pub struct Pty(crate::sys::Pty);
+pub struct Pty(pub(crate) crate::sys::Pty);
 
 impl Pty {
     /// Allocate and return a new pty.
