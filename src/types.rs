@@ -38,6 +38,7 @@ impl Size {
     }
 }
 
+#[cfg(unix)]
 impl From<Size> for libc::winsize {
     fn from(size: Size) -> Self {
         Self {

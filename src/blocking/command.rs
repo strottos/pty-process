@@ -1,5 +1,3 @@
-use std::os::unix::process::CommandExt as _;
-
 /// Wrapper around [`std::process::Command`]
 pub struct Command {
     inner: std::process::Command,
@@ -164,36 +162,5 @@ impl Command {
         self.pre_exec_set = true;
 
         Ok(self.inner.spawn()?)
-    }
-
-    /// See [`std::os::unix::process::CommandExt::uid`]
-    pub fn uid(&mut self, id: u32) -> &mut Self {
-        self.inner.uid(id);
-        self
-    }
-
-    /// See [`std::os::unix::process::CommandExt::gid`]
-    pub fn gid(&mut self, id: u32) -> &mut Self {
-        self.inner.gid(id);
-        self
-    }
-
-    /// See [`std::os::unix::process::CommandExt::pre_exec`]
-    #[allow(clippy::missing_safety_doc)]
-    pub unsafe fn pre_exec<F>(&mut self, f: F) -> &mut Self
-    where
-        F: FnMut() -> std::io::Result<()> + Send + Sync + 'static,
-    {
-        self.pre_exec = Some(Box::new(f));
-        self
-    }
-
-    /// See [`std::os::unix::process::CommandExt::arg0`]
-    pub fn arg0<S>(&mut self, arg: S) -> &mut Self
-    where
-        S: AsRef<std::ffi::OsStr>,
-    {
-        self.inner.arg0(arg);
-        self
     }
 }
