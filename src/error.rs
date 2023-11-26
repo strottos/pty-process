@@ -3,7 +3,13 @@
 pub enum Error {
     /// error came from std::io::Error
     Io(std::io::Error),
+    // error came from std::num::TryFromIntError
+    TryFromInt(std::num::TryFromIntError),
+    /// error came from windows::Error
+    #[cfg(windows)]
+    Windows(windows::core::Error),
     /// error came from nix::Error
+    #[cfg(unix)]
     Rustix(rustix::io::Errno),
     /// unsplit was called on halves of two different ptys
     #[cfg(feature = "async")]
@@ -14,6 +20,10 @@ impl std::fmt::Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Io(e) => write!(f, "{e}"),
+            Self::TryFromInt(e) => write!(f, "{e}"),
+            #[cfg(windows)]
+            Self::Windows(e) => write!(f, "{e}"),
+            #[cfg(unix)]
             Self::Rustix(e) => write!(f, "{e}"),
             #[cfg(feature = "async")]
             Self::Unsplit(..) => {
@@ -29,6 +39,20 @@ impl std::convert::From<std::io::Error> for Error {
     }
 }
 
+impl std::convert::From<std::num::TryFromIntError> for Error {
+    fn from(e: std::num::TryFromIntError) -> Self {
+        Self::TryFromInt(e)
+    }
+}
+
+#[cfg(windows)]
+impl std::convert::From<windows::core::Error> for Error {
+    fn from(e: windows::core::Error) -> Self {
+        Self::Windows(e)
+    }
+}
+
+#[cfg(unix)]
 impl std::convert::From<rustix::io::Errno> for Error {
     fn from(e: rustix::io::Errno) -> Self {
         Self::Rustix(e)
@@ -39,6 +63,10 @@ impl std::error::Error for Error {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
             Self::Io(e) => Some(e),
+            Self::TryFromInt(e) => Some(e),
+            #[cfg(windows)]
+            Self::Windows(e) => Some(e),
+            #[cfg(unix)]
             Self::Rustix(e) => Some(e),
             #[cfg(feature = "async")]
             Self::Unsplit(..) => None,

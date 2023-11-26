@@ -36,6 +36,14 @@ impl Size {
             ypixel,
         }
     }
+
+    pub(crate) fn rows(&self) -> u16 {
+        self.row
+    }
+
+    pub(crate) fn cols(&self) -> u16 {
+        self.col
+    }
 }
 
 #[cfg(unix)]

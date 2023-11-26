@@ -8,3 +8,5 @@ pub use pty::{Pts, Pty};
 
 #[cfg(unix)]
 mod unix;
+#[cfg(windows)]
+mod windows;
